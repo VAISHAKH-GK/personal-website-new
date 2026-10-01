@@ -1,0 +1,752 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import Header from '../components/Header.astro';
+import VersionHistory from '../components/VersionHistory.astro';
+import Changelog from '../components/Changelog.astro';
+
+type Props = CollectionEntry<'projects'>['data'] & {
+	slug: string;
+};
+
+const {
+	title,
+	description,
+	category,
+	status,
+	version,
+	versionStatus,
+	currentVersion,
+	majorVersions,
+	changelog,
+	startedDate,
+	launchedDate,
+	updatedDate,
+	heroImage,
+	techStack,
+	repoUrl,
+	liveUrl,
+	slug
+} = Astro.props;
+
+// Build breadcrumb items
+const isPreviousVersion = versionStatus === 'previous';
+const breadcrumbItems = [
+	{ label: 'Home', href: '/' },
+	{ label: 'Projects', href: '/projects/' },
+];
+
+if (isPreviousVersion && currentVersion) {
+	// For previous versions: Projects > Project Name > vX.X
+	breadcrumbItems.push({ label: title, href: `/projects/${currentVersion}/` });
+	breadcrumbItems.push({ label: version || 'Previous' });
+} else {
+	// For current versions: Projects > Project Name
+	breadcrumbItems.push({ label: title });
+}
+
+const categoryLabels = {
+	'aws-security': 'AWS Security',
+	'aws-infra': 'AWS Infrastructure',
+	'homelab': 'Homelab',
+	'ai-tools': 'AI & Automation',
+	'local-dev': 'Local Development',
+	'aws-ai': 'AWS AI/ML',
+	'frontend-development': 'Frontend Development'
+};
+---
+<html lang="en">
+	<head>
+		<BaseHead title={title} description={description} />
+		<style>
+			/* ========================================
+			   MAIN LAYOUT STRUCTURE
+			   ======================================== */
+			main {
+				width: 100%;
+				margin: 0;
+				padding: 0;
+			}
+
+			.hero-image {
+				width: 100%;
+				max-width: var(--container-medium);
+				margin: 0 auto;
+				padding: 0 1rem;
+			}
+
+			.hero-image img {
+				display: block;
+				margin: 0 auto;
+				border-radius: 12px;
+				box-shadow: var(--box-shadow);
+			}
+
+			/* Main page container - two column grid on desktop */
+			.page-container {
+				max-width: var(--container-extra-wide);
+				margin: 0 auto;
+				padding: 0 1rem var(--space-lg);
+				width: 100%;
+			}
+
+			/* ========================================
+			   BREADCRUMBS - Subtle, left-aligned
+			   ======================================== */
+			.breadcrumbs-wrapper {
+				max-width: var(--container-extra-wide);
+				margin: 0 auto;
+				padding: 0.5rem 1rem 0;
+			}
+
+			/* ========================================
+			   TABLE OF CONTENTS SIDEBAR
+			   ======================================== */
+			.toc-sidebar {
+				display: none; /* Hidden by default on mobile */
+			}
+
+			.toc-nav {
+				padding: 1rem;
+				background: var(--bg-secondary);
+				border: 1px solid var(--border-color);
+				border-radius: 8px;
+			}
+
+			.toc-nav h4 {
+				margin: 0 0 0.75rem 0;
+				font-size: 0.75rem;
+				font-weight: 600;
+				color: rgb(var(--gray));
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
+			}
+
+			.toc-nav ul {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+			}
+
+			.toc-nav li {
+				margin: 0;
+			}
+
+			.toc-nav a {
+				display: block;
+				padding: 0.375rem 0.5rem;
+				color: rgb(var(--gray));
+				text-decoration: none;
+				border-left: 2px solid transparent;
+				transition: all 0.2s ease;
+				font-size: 0.8rem;
+				line-height: 1.4;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				display: -webkit-box;
+				-webkit-line-clamp: 2;
+				-webkit-box-orient: vertical;
+				white-space: normal;
+			}
+
+			.toc-nav a:hover {
+				color: var(--accent);
+				border-left-color: var(--accent);
+				background: rgba(74, 103, 65, 0.05);
+			}
+
+			.toc-nav a.active {
+				color: var(--accent);
+				border-left-color: var(--accent);
+				font-weight: 600;
+				background: rgba(74, 103, 65, 0.1);
+			}
+
+			.toc-nav .toc-h3 {
+				padding-left: 1rem;
+				font-size: 0.75rem;
+			}
+
+			/* ========================================
+			   MAIN CONTENT AREA
+			   ======================================== */
+			.main-content {
+				width: 100%;
+			}
+
+			.prose {
+				color: rgb(var(--gray-dark));
+			}
+
+			/* ========================================
+			   TITLE SECTION / HEADER BLOCK
+			   ======================================== */
+			.title-section {
+				margin-bottom: var(--space-md);
+				padding-bottom: var(--space-md);
+				border-bottom: 1px solid var(--border-color);
+			}
+
+			.title-section h1 {
+				margin: 0 0 0.5rem 0;
+				font-size: 2rem;
+				line-height: 1.2;
+			}
+
+			.title-section .description {
+				margin: 0 0 1rem 0;
+				font-size: 1.05rem;
+				color: rgb(var(--gray));
+				line-height: 1.5;
+			}
+
+			.meta {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.75rem 1rem;
+				margin: 0 0 1rem 0;
+				font-size: 0.85rem;
+				color: rgb(var(--gray));
+			}
+
+			.meta-item {
+				display: flex;
+				align-items: center;
+				gap: 0.375rem;
+			}
+
+			.category {
+				background: rgba(74, 103, 65, 0.65);
+				color: white;
+				padding: 0.2rem 0.6rem;
+				border-radius: 4px;
+				font-weight: 600;
+				text-transform: uppercase;
+				font-size: 0.7rem;
+				letter-spacing: 0.5px;
+			}
+
+			.status {
+				font-weight: 600;
+				text-transform: uppercase;
+				font-size: 0.8rem;
+			}
+
+			.status.launched {
+				color: var(--accent);
+			}
+
+			.status.in-development {
+				color: #d97706;
+			}
+
+			/* CTA Links */
+			.cta-links {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.75rem;
+				margin: 1rem 0;
+			}
+
+			.live-link,
+			.repo-link {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.5rem;
+				padding: 0.5rem 1rem;
+				background: var(--accent);
+				color: white;
+				text-decoration: none;
+				border-radius: 6px;
+				font-weight: 600;
+				transition: all 0.2s ease;
+				font-size: 0.85rem;
+			}
+
+			.live-link:hover,
+			.repo-link:hover {
+				background: var(--accent-dark);
+				transform: translateY(-1px);
+				color: white;
+			}
+
+			.repo-link {
+				background: transparent;
+				color: rgb(var(--gray-dark));
+				border: 1px solid var(--border-color);
+			}
+
+			.repo-link:hover {
+				background: var(--bg-secondary);
+				border-color: rgb(var(--gray));
+				color: rgb(var(--gray-dark));
+				transform: translateY(-1px);
+			}
+
+			/* Tech Stack */
+			.tech-stack {
+				margin: 1rem 0 0.5rem;
+			}
+
+			.tech-stack h3 {
+				font-size: 0.75rem;
+				font-weight: 600;
+				margin-bottom: 0.5rem;
+				color: rgb(var(--gray));
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
+			}
+
+			.tech-tags {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.375rem;
+			}
+
+			.tech-tag {
+				display: inline-block;
+				background: var(--bg-secondary);
+				border: 1px solid var(--border-color);
+				padding: 0.25rem 0.5rem;
+				border-radius: 4px;
+				font-size: 0.8rem;
+				color: rgb(var(--gray-dark));
+			}
+
+			/* ========================================
+			   MOBILE TABLE OF CONTENTS (collapsible)
+			   ======================================== */
+			.toc-mobile {
+				margin: 1rem 0;
+				border: 1px solid var(--border-color);
+				border-radius: 8px;
+				background: var(--bg-secondary);
+			}
+
+			.toc-mobile summary {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 0.75rem 1rem;
+				cursor: pointer;
+				font-size: 0.8rem;
+				font-weight: 600;
+				color: rgb(var(--gray));
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
+			}
+
+			.toc-mobile summary::-webkit-details-marker {
+				display: none;
+			}
+
+			.toc-mobile summary::marker {
+				display: none;
+				content: '';
+			}
+
+			.toc-mobile .chevron {
+				transition: transform 0.2s ease;
+			}
+
+			.toc-mobile[open] .chevron {
+				transform: rotate(180deg);
+			}
+
+			.toc-mobile .toc-content {
+				padding: 0 1rem 1rem;
+			}
+
+			.toc-mobile .toc-content ul {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+			}
+
+			.toc-mobile .toc-content a {
+				display: block;
+				padding: 0.375rem 0;
+				color: rgb(var(--gray));
+				text-decoration: none;
+				font-size: 0.85rem;
+				border-bottom: 1px solid var(--border-color);
+			}
+
+			.toc-mobile .toc-content li:last-child a {
+				border-bottom: none;
+			}
+
+			.toc-mobile .toc-content a:hover {
+				color: var(--accent);
+			}
+
+			.toc-mobile .toc-content .toc-h3 {
+				padding-left: 1rem;
+				font-size: 0.8rem;
+			}
+
+			/* ========================================
+			   DESKTOP TWO-COLUMN LAYOUT
+			   ======================================== */
+			@media (min-width: 1024px) {
+				.page-container {
+					display: grid;
+					grid-template-columns: 220px 1fr;
+					gap: 2rem;
+					align-items: start;
+					padding-top: 0;
+				}
+
+				/* Show sidebar TOC on desktop */
+				.toc-sidebar {
+					display: block;
+					position: sticky;
+					top: 80px;
+					max-height: calc(100vh - 100px);
+					overflow-y: auto;
+					padding-top: 0.25rem; /* Align with H1 */
+				}
+
+				/* Hide mobile TOC on desktop */
+				.toc-mobile {
+					display: none;
+				}
+
+				.title-section h1 {
+					font-size: 2.25rem;
+				}
+			}
+
+			/* Large desktop */
+			@media (min-width: 1280px) {
+				.page-container {
+					grid-template-columns: 240px 1fr;
+					gap: 3rem;
+				}
+			}
+
+			/* ========================================
+			   TABLET (768px - 1023px)
+			   ======================================== */
+			@media (min-width: 768px) and (max-width: 1023px) {
+				.title-section h1 {
+					font-size: 2rem;
+				}
+			}
+
+			/* ========================================
+			   MOBILE (< 768px)
+			   ======================================== */
+			@media (max-width: 767px) {
+				.title-section h1 {
+					font-size: 1.5rem;
+				}
+
+				.meta {
+					gap: 0.5rem 0.75rem;
+				}
+
+				.cta-links {
+					flex-direction: column;
+				}
+
+				.live-link,
+				.repo-link {
+					justify-content: center;
+				}
+			}
+		</style>
+		<script>
+			// Build table of contents with scroll spy
+			document.addEventListener('DOMContentLoaded', () => {
+				const prose = document.querySelector('.prose');
+				if (!prose) return;
+
+				// Find all h2 and h3 headings in the content (not in title-section)
+				const headings = Array.from(prose.querySelectorAll('h2, h3')).filter(
+					(h) => !h.closest('.title-section')
+				);
+
+				if (headings.length === 0) return;
+
+				// Assign IDs to headings if they don't have them
+				headings.forEach((heading, index) => {
+					if (!heading.id) {
+						const text = heading.textContent?.trim() || '';
+						const id = text
+							.toLowerCase()
+							.replace(/[^a-z0-9]+/g, '-')
+							.replace(/^-|-$/g, '');
+						heading.id = id || `heading-${index}`;
+					}
+				});
+
+				// Build TOC HTML
+				const buildTocList = () => {
+					let html = '';
+					headings.forEach((heading) => {
+						const headingText = heading.textContent || '';
+						const className = heading.tagName === 'H3' ? 'toc-h3' : '';
+						html += `<li><a href="#${heading.id}" class="${className}" title="${headingText}">${headingText}</a></li>`;
+					});
+					return html;
+				};
+
+				const tocHtml = buildTocList();
+
+				// Desktop sidebar TOC
+				const sidebarToc = document.querySelector('.toc-sidebar');
+				if (sidebarToc) {
+					const nav = document.createElement('nav');
+					nav.className = 'toc-nav';
+					nav.setAttribute('aria-label', 'Table of contents');
+					nav.innerHTML = `
+						<h4>On This Page</h4>
+						<ul>${tocHtml}</ul>
+					`;
+					sidebarToc.appendChild(nav);
+				}
+
+				// Mobile collapsible TOC
+				const mobileTocContent = document.querySelector('.toc-mobile .toc-content ul');
+				if (mobileTocContent) {
+					mobileTocContent.innerHTML = tocHtml;
+				}
+
+				// Scroll spy functionality
+				const tocNav = document.querySelector('.toc-nav');
+				if (!tocNav) return;
+
+				const observerOptions = {
+					rootMargin: '-100px 0px -66%',
+					threshold: 0
+				};
+
+				const observerCallback = (entries: IntersectionObserverEntry[]) => {
+					entries.forEach((entry) => {
+						const id = entry.target.getAttribute('id');
+						const link = tocNav?.querySelector(`a[href="#${id}"]`);
+						if (entry.isIntersecting) {
+							tocNav?.querySelectorAll('a').forEach((a) => a.classList.remove('active'));
+							link?.classList.add('active');
+						}
+					});
+				};
+
+				const observer = new IntersectionObserver(observerCallback, observerOptions);
+				headings.forEach((heading) => observer.observe(heading));
+			});
+		</script>
+		<script>
+			import mermaid from 'mermaid';
+
+			document.addEventListener('DOMContentLoaded', async () => {
+				mermaid.initialize({
+					startOnLoad: false,
+					theme: 'neutral',
+					themeVariables: {
+						fontSize: '14px',
+						fontFamily: '"JetBrains Mono", monospace',
+					},
+					flowchart: {
+						padding: 20,
+						nodeSpacing: 60,
+						rankSpacing: 60,
+						curve: 'basis',
+						useMaxWidth: true,
+						htmlLabels: true,
+						diagramPadding: 20,
+					},
+				});
+
+				// Find all pre blocks with mermaid diagrams
+				const allPre = document.querySelectorAll('pre');
+				const mermaidPres: Element[] = [];
+
+				allPre.forEach((pre) => {
+					const text = pre.textContent || '';
+					if (text.includes('graph TB') || text.includes('graph TD') ||
+					    text.includes('flowchart') || text.includes('sequenceDiagram') ||
+					    text.includes('classDiagram') || text.includes('stateDiagram') ||
+					    text.includes('gantt') || text.includes('pie')) {
+						mermaidPres.push(pre);
+					}
+				});
+
+				for (const pre of mermaidPres) {
+					const code = pre.textContent || '';
+					const div = document.createElement('div');
+					div.className = 'mermaid';
+					div.textContent = code;
+					div.style.margin = '1.5rem 0';
+					div.style.display = 'flex';
+					div.style.justifyContent = 'center';
+					pre.replaceWith(div);
+				}
+
+				const mermaidDivs = document.querySelectorAll('.mermaid');
+				if (mermaidDivs.length > 0) {
+					try {
+						await mermaid.run({ querySelector: '.mermaid' });
+
+						// Enable zoom on rendered diagrams
+						const svgs = document.querySelectorAll('.mermaid svg');
+						svgs.forEach(svg => {
+							(svg as HTMLElement).style.cursor = 'zoom-in';
+							(svg as HTMLElement).style.transition = 'opacity 0.2s';
+
+							svg.addEventListener('click', () => {
+								const overlay = document.createElement('div');
+								overlay.style.cssText = `
+									position: fixed;
+									top: 0;
+									left: 0;
+									width: 100vw;
+									height: 100vh;
+									background: rgba(0, 0, 0, 0.9);
+									display: flex;
+									align-items: center;
+									justify-content: center;
+									z-index: 9999;
+									cursor: zoom-out;
+									padding: 48px;
+									box-sizing: border-box;
+								`;
+
+								const clone = svg.cloneNode(true) as HTMLElement;
+								clone.style.cssText = `
+									max-width: 90vw;
+									max-height: 90vh;
+									width: auto;
+									height: auto;
+									cursor: zoom-out;
+								`;
+
+								overlay.appendChild(clone);
+								document.body.appendChild(overlay);
+
+								overlay.addEventListener('click', () => overlay.remove());
+
+								const closeOnEsc = (e: KeyboardEvent) => {
+									if (e.key === 'Escape') {
+										overlay.remove();
+										document.removeEventListener('keydown', closeOnEsc);
+									}
+								};
+								document.addEventListener('keydown', closeOnEsc);
+							});
+						});
+					} catch (error) {
+						console.error('Mermaid rendering error:', error);
+					}
+				}
+			});
+		</script>
+	</head>
+
+	<body>
+		<Header />
+
+		<!-- Breadcrumbs - left-aligned, subtle -->
+		<div class="breadcrumbs-wrapper">
+			<Breadcrumbs items={breadcrumbItems} />
+		</div>
+
+		<main>
+			<article>
+				<div class="hero-image">
+					{heroImage && <Image width={1020} height={510} src={heroImage} alt="" />}
+				</div>
+
+				<div class="page-container">
+					<!-- Desktop sidebar TOC (populated by JS) -->
+					<aside class="toc-sidebar" aria-label="Table of contents"></aside>
+
+					<!-- Main content column -->
+					<div class="main-content">
+						<div class="prose">
+							<div class="title-section">
+								<h1>{title}</h1>
+								<p class="description">{description}</p>
+
+								<div class="meta">
+									<div class="meta-item">
+										<span class="category">{categoryLabels[category]}</span>
+									</div>
+									<div class="meta-item">
+										Status: <span class={`status ${status}`}>{status.replace('-', ' ')}</span>
+									</div>
+									<div class="meta-item">
+										Started: <FormattedDate date={startedDate} />
+									</div>
+									{launchedDate && (
+										<div class="meta-item">
+											Launched: <FormattedDate date={launchedDate} />
+										</div>
+									)}
+								</div>
+
+								{(liveUrl || repoUrl) && (
+									<div class="cta-links">
+										{liveUrl && (
+											<a href={liveUrl} class="live-link" target="_blank">
+												<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+												Visit Live Site
+											</a>
+										)}
+										{repoUrl && (
+											<a href={repoUrl} class="repo-link" target="_blank">
+												<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+												View on GitHub
+											</a>
+										)}
+									</div>
+								)}
+
+								<div class="tech-stack">
+									<h3>Tech Stack</h3>
+									<div class="tech-tags">
+										{techStack.map((tech) => (
+											<span class="tech-tag">{tech}</span>
+										))}
+									</div>
+								</div>
+
+								<VersionHistory
+									currentVersion={version}
+									majorVersions={majorVersions}
+									isPreviousVersion={isPreviousVersion}
+									currentVersionSlug={currentVersion}
+								/>
+							</div>
+
+							<!-- Mobile TOC (collapsible) -->
+							<details class="toc-mobile">
+								<summary>
+									<span>Table of Contents</span>
+									<svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<polyline points="6 9 12 15 18 9"></polyline>
+									</svg>
+								</summary>
+								<div class="toc-content">
+									<ul></ul>
+								</div>
+							</details>
+
+							<slot />
+
+							{!isPreviousVersion && (
+								<Changelog entries={changelog} />
+							)}
+						</div>
+					</div>
+				</div>
+			</article>
+		</main>
+		<Footer />
+	</body>
+</html>

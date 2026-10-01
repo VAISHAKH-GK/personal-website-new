@@ -1,0 +1,539 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import Header from '../components/Header.astro';
+
+type Props = CollectionEntry<'blog'>['data'];
+
+const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+
+// Build breadcrumb items
+const breadcrumbItems = [
+	{ label: 'Home', href: '/' },
+	{ label: 'Blog', href: '/blog/' },
+	{ label: title },
+];
+---
+
+<html lang="en">
+	<head>
+		<BaseHead title={title} description={description} />
+		<style>
+			/* ========================================
+			   MAIN LAYOUT STRUCTURE
+			   ======================================== */
+			main {
+				width: 100%;
+				margin: 0;
+				padding: 0;
+			}
+
+			/* Main page container - two column grid on desktop */
+			.page-container {
+				max-width: var(--container-extra-wide);
+				margin: 0 auto;
+				padding: 0 1rem var(--space-lg);
+				width: 100%;
+			}
+
+			/* ========================================
+			   BREADCRUMBS - Subtle, left-aligned
+			   ======================================== */
+			.breadcrumbs-wrapper {
+				max-width: var(--container-extra-wide);
+				margin: 0 auto;
+				padding: 0.5rem 1rem 0;
+			}
+
+			/* ========================================
+			   TABLE OF CONTENTS SIDEBAR
+			   ======================================== */
+			.toc-sidebar {
+				display: none; /* Hidden by default on mobile */
+			}
+
+			.toc-nav {
+				padding: 1rem;
+				background: var(--bg-secondary);
+				border: 1px solid var(--border-color);
+				border-radius: 8px;
+			}
+
+			.toc-nav h4 {
+				margin: 0 0 0.75rem 0;
+				font-size: 0.75rem;
+				font-weight: 600;
+				color: rgb(var(--gray));
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
+			}
+
+			.toc-nav ul {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+			}
+
+			.toc-nav li {
+				margin: 0;
+			}
+
+			.toc-nav a {
+				display: block;
+				padding: 0.375rem 0.5rem;
+				color: rgb(var(--gray));
+				text-decoration: none;
+				border-left: 2px solid transparent;
+				transition: all 0.2s ease;
+				font-size: 0.8rem;
+				line-height: 1.4;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				display: -webkit-box;
+				-webkit-line-clamp: 2;
+				-webkit-box-orient: vertical;
+				white-space: normal;
+			}
+
+			.toc-nav a:hover {
+				color: var(--accent);
+				border-left-color: var(--accent);
+				background: rgba(74, 103, 65, 0.05);
+			}
+
+			.toc-nav a.active {
+				color: var(--accent);
+				border-left-color: var(--accent);
+				font-weight: 600;
+				background: rgba(74, 103, 65, 0.1);
+			}
+
+			.toc-nav .toc-h3 {
+				padding-left: 1rem;
+				font-size: 0.75rem;
+			}
+
+			/* ========================================
+			   MAIN CONTENT AREA
+			   ======================================== */
+			.main-content {
+				width: 100%;
+			}
+
+			.prose {
+				color: rgb(var(--gray-dark));
+			}
+
+			/* ========================================
+			   TITLE SECTION / HEADER BLOCK
+			   ======================================== */
+			.title-section {
+				margin-bottom: var(--space-md);
+				padding-bottom: var(--space-md);
+				border-bottom: 1px solid var(--border-color);
+			}
+
+			.title-section h1 {
+				margin: 0 0 0.5rem 0;
+				font-size: 2rem;
+				line-height: 1.2;
+			}
+
+			.title-section .date {
+				color: rgb(var(--gray));
+				font-size: 0.9rem;
+				margin-bottom: 0.5rem;
+			}
+
+			.title-section .last-updated-on {
+				font-style: italic;
+				font-size: 0.85rem;
+			}
+
+			/* ========================================
+			   MOBILE TABLE OF CONTENTS (collapsible)
+			   ======================================== */
+			.toc-mobile {
+				margin: 1rem 0;
+				border: 1px solid var(--border-color);
+				border-radius: 8px;
+				background: var(--bg-secondary);
+			}
+
+			.toc-mobile summary {
+				display: flex;
+				align-items: center;
+				justify-content: space-between;
+				padding: 0.75rem 1rem;
+				cursor: pointer;
+				font-size: 0.8rem;
+				font-weight: 600;
+				color: rgb(var(--gray));
+				text-transform: uppercase;
+				letter-spacing: 0.5px;
+			}
+
+			.toc-mobile summary::-webkit-details-marker {
+				display: none;
+			}
+
+			.toc-mobile summary::marker {
+				display: none;
+				content: '';
+			}
+
+			.toc-mobile .chevron {
+				transition: transform 0.2s ease;
+			}
+
+			.toc-mobile[open] .chevron {
+				transform: rotate(180deg);
+			}
+
+			.toc-mobile .toc-content {
+				padding: 0 1rem 1rem;
+			}
+
+			.toc-mobile .toc-content ul {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+			}
+
+			.toc-mobile .toc-content a {
+				display: block;
+				padding: 0.375rem 0;
+				color: rgb(var(--gray));
+				text-decoration: none;
+				font-size: 0.85rem;
+				border-bottom: 1px solid var(--border-color);
+			}
+
+			.toc-mobile .toc-content li:last-child a {
+				border-bottom: none;
+			}
+
+			.toc-mobile .toc-content a:hover {
+				color: var(--accent);
+			}
+
+			.toc-mobile .toc-content .toc-h3 {
+				padding-left: 1rem;
+				font-size: 0.8rem;
+			}
+
+			/* ========================================
+			   DESKTOP TWO-COLUMN LAYOUT
+			   ======================================== */
+			@media (min-width: 1024px) {
+				.page-container {
+					display: grid;
+					grid-template-columns: 220px 1fr;
+					gap: 2rem;
+					align-items: start;
+					padding-top: 0;
+				}
+
+				/* Show sidebar TOC on desktop */
+				.toc-sidebar {
+					display: block;
+					position: sticky;
+					top: 80px;
+					max-height: calc(100vh - 100px);
+					overflow-y: auto;
+					padding-top: 0.25rem; /* Align with H1 */
+				}
+
+				/* Hide mobile TOC on desktop */
+				.toc-mobile {
+					display: none;
+				}
+
+				.title-section h1 {
+					font-size: 2.25rem;
+				}
+			}
+
+			/* Large desktop */
+			@media (min-width: 1280px) {
+				.page-container {
+					grid-template-columns: 240px 1fr;
+					gap: 3rem;
+				}
+			}
+
+			/* ========================================
+			   TABLET (768px - 1023px)
+			   ======================================== */
+			@media (min-width: 768px) and (max-width: 1023px) {
+				.title-section h1 {
+					font-size: 2rem;
+				}
+			}
+
+			/* ========================================
+			   MOBILE (< 768px)
+			   ======================================== */
+			@media (max-width: 767px) {
+				.title-section h1 {
+					font-size: 1.5rem;
+				}
+			}
+		</style>
+		<script>
+			// Build table of contents with scroll spy
+			document.addEventListener('DOMContentLoaded', () => {
+				const prose = document.querySelector('.prose');
+				if (!prose) return;
+
+				// Find all h2 and h3 headings in the content (not in title-section)
+				const headings = Array.from(prose.querySelectorAll('h2, h3')).filter(
+					(h) => !h.closest('.title-section')
+				);
+
+				if (headings.length === 0) return;
+
+				// Assign IDs to headings if they don't have them
+				headings.forEach((heading, index) => {
+					if (!heading.id) {
+						const text = heading.textContent?.trim() || '';
+						const id = text
+							.toLowerCase()
+							.replace(/[^a-z0-9]+/g, '-')
+							.replace(/^-|-$/g, '');
+						heading.id = id || `heading-${index}`;
+					}
+				});
+
+				// Build TOC HTML
+				const buildTocList = () => {
+					let html = '';
+					headings.forEach((heading) => {
+						const headingText = heading.textContent || '';
+						const className = heading.tagName === 'H3' ? 'toc-h3' : '';
+						html += `<li><a href="#${heading.id}" class="${className}" title="${headingText}">${headingText}</a></li>`;
+					});
+					return html;
+				};
+
+				const tocHtml = buildTocList();
+
+				// Populate desktop sidebar TOC
+				const sidebarToc = document.querySelector('.toc-sidebar');
+				if (sidebarToc) {
+					sidebarToc.innerHTML = `
+						<nav class="toc-nav" aria-label="Table of contents">
+							<h4>On This Page</h4>
+							<ul>${tocHtml}</ul>
+						</nav>
+					`;
+				}
+
+				// Populate mobile TOC
+				const mobileToc = document.querySelector('.toc-mobile .toc-content ul');
+				if (mobileToc) {
+					mobileToc.innerHTML = tocHtml;
+				}
+
+				// Scroll spy functionality
+				const tocNav = sidebarToc?.querySelector('.toc-nav');
+				if (!tocNav) return;
+
+				const observerOptions = {
+					rootMargin: '-100px 0px -66%',
+					threshold: 0
+				};
+
+				const observerCallback = (entries: IntersectionObserverEntry[]) => {
+					entries.forEach((entry) => {
+						const id = entry.target.getAttribute('id');
+						const link = tocNav.querySelector(`a[href="#${id}"]`);
+						if (entry.isIntersecting) {
+							// Remove active from all links
+							tocNav.querySelectorAll('a').forEach((a) => a.classList.remove('active'));
+							// Add active to current link
+							link?.classList.add('active');
+						}
+					});
+				};
+
+				const observer = new IntersectionObserver(observerCallback, observerOptions);
+				headings.forEach((heading) => observer.observe(heading));
+			});
+		</script>
+		<script>
+			import mermaid from 'mermaid';
+
+			document.addEventListener('DOMContentLoaded', async () => {
+				mermaid.initialize({
+					startOnLoad: false,
+					theme: 'neutral',
+					themeVariables: {
+						fontSize: '16px',
+						fontFamily: '"JetBrains Mono", monospace',
+					},
+					flowchart: {
+						padding: 25,
+						nodeSpacing: 80,
+						rankSpacing: 80,
+						curve: 'basis',
+						useMaxWidth: true,
+						htmlLabels: true,
+						diagramPadding: 30,
+					},
+				});
+
+				// Find all pre blocks and check their content for mermaid diagrams
+				const allPre = document.querySelectorAll('pre');
+				const mermaidPres: Element[] = [];
+
+				allPre.forEach((pre) => {
+					const text = (pre.textContent || '').trim();
+
+					// Check if this is a mermaid diagram - must START with a diagram keyword
+					const mermaidPatterns = [
+						/^graph\s+(TB|TD|BT|RL|LR)/,
+						/^flowchart\s+(TB|TD|BT|RL|LR)/,
+						/^sequenceDiagram/,
+						/^classDiagram/,
+						/^stateDiagram/,
+						/^erDiagram/,
+						/^gantt/,
+						/^pie/,
+						/^gitGraph/,
+					];
+
+					if (mermaidPatterns.some(pattern => pattern.test(text))) {
+						mermaidPres.push(pre);
+					}
+				});
+
+				for (const pre of mermaidPres) {
+					const code = pre.textContent || '';
+					const div = document.createElement('div');
+					div.className = 'mermaid';
+					div.textContent = code;
+					div.style.margin = '2rem 0';
+					div.style.display = 'flex';
+					div.style.justifyContent = 'center';
+					pre.replaceWith(div);
+				}
+
+				// Render mermaid diagrams
+				const mermaidDivs = document.querySelectorAll('.mermaid');
+				if (mermaidDivs.length > 0) {
+					try {
+						await mermaid.run({ querySelector: '.mermaid' });
+
+						// Enable zoom on rendered diagrams
+						const svgs = document.querySelectorAll('.mermaid svg');
+						svgs.forEach(svg => {
+							(svg as HTMLElement).style.cursor = 'zoom-in';
+							(svg as HTMLElement).style.transition = 'opacity 0.2s';
+
+							svg.addEventListener('click', () => {
+								const overlay = document.createElement('div');
+								overlay.style.cssText = `
+									position: fixed;
+									top: 0;
+									left: 0;
+									width: 100vw;
+									height: 100vh;
+									background: rgba(0, 0, 0, 0.9);
+									display: flex;
+									align-items: center;
+									justify-content: center;
+									z-index: 9999;
+									cursor: zoom-out;
+									padding: 48px;
+									box-sizing: border-box;
+								`;
+
+								const clone = svg.cloneNode(true) as HTMLElement;
+								clone.style.cssText = `
+									max-width: 90vw;
+									max-height: 90vh;
+									width: auto;
+									height: auto;
+									cursor: zoom-out;
+								`;
+
+								overlay.appendChild(clone);
+								document.body.appendChild(overlay);
+
+								overlay.addEventListener('click', () => overlay.remove());
+
+								const closeOnEsc = (e: KeyboardEvent) => {
+									if (e.key === 'Escape') {
+										overlay.remove();
+										document.removeEventListener('keydown', closeOnEsc);
+									}
+								};
+								document.addEventListener('keydown', closeOnEsc);
+							});
+						});
+					} catch (error) {
+						console.error('Mermaid rendering error:', error);
+					}
+				}
+			});
+		</script>
+	</head>
+
+	<body>
+		<Header />
+
+		<!-- Breadcrumbs - left-aligned, subtle -->
+		<div class="breadcrumbs-wrapper">
+			<Breadcrumbs items={breadcrumbItems} />
+		</div>
+
+		<main>
+			<article>
+				<div class="page-container">
+					<!-- Desktop sidebar TOC (populated by JS) -->
+					<aside class="toc-sidebar" aria-label="Table of contents"></aside>
+
+					<!-- Main content column -->
+					<div class="main-content">
+						<div class="prose">
+							<div class="title-section">
+								{pubDate && (
+									<div class="date">
+										<FormattedDate date={pubDate} />
+										{updatedDate && (
+											<div class="last-updated-on">
+												Last updated on <FormattedDate date={updatedDate} />
+											</div>
+										)}
+									</div>
+								)}
+								<h1>{title}</h1>
+							</div>
+
+							<!-- Mobile TOC (collapsible) -->
+							<details class="toc-mobile">
+								<summary>
+									<span>On This Page</span>
+									<svg class="chevron" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+										<polyline points="6 9 12 15 18 9"></polyline>
+									</svg>
+								</summary>
+								<div class="toc-content">
+									<ul></ul>
+								</div>
+							</details>
+
+							<slot />
+						</div>
+					</div>
+				</div>
+			</article>
+		</main>
+		<Footer />
+	</body>
+</html>
