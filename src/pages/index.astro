@@ -41,6 +41,50 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 				width: 20px;
 				height: 20px;
 			}
+			.intro {
+    width: min(900px, 90%);
+    margin: 3rem auto 2.5rem;
+    text-align: left;
+}
+
+.intro p {
+    margin: 0 0 1.25rem;
+    font-size: 1rem;
+    line-height: 1.8;
+    letter-spacing: 0.02em;
+    color: #c9d1c9;
+}
+
+.intro p:last-child {
+    margin-bottom: 0;
+}
+
+/* Tablet */
+@media (max-width: 768px) {
+    .intro {
+        width: min(90%, 650px);
+        margin-top: 2.5rem;
+    }
+
+    .intro p {
+        font-size: 0.95rem;
+        line-height: 1.75;
+    }
+}
+
+/* Mobile */
+@media (max-width: 480px) {
+    .intro {
+        width: 88%;
+        margin-top: 2rem;
+    }
+
+    .intro p {
+        font-size: 0.88rem;
+        line-height: 1.7;
+        letter-spacing: 0.01em;
+    }
+}
 		</style>
 	</head>
 	<body>
@@ -56,19 +100,19 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 			<div class="intro">
 				<p>
 					I'm a backend developer with experience building web applications,
-					APIs, and distributed systems,<br> with a growing focus on cybersecurity
+					APIs, and distributed systems, with a growing focus on cybersecurity
 					and security engineering.
 				</p>
 
 				<p>
 					My software engineering background helps me understand security from
-					both sides — how applications<br> and backend systems are built, and how
+					both sides — how applications and backend systems are built, and how
 					they can be analyzed, tested, and secured.
 				</p>
 
 				<p>
 					I'm currently exploring Linux, networking, wireless security,
-					low-level programming, and application securit:<br> while building
+					low-level programming, and application securit: while building
 					security-focused projects and documenting what I learn through
 					technical writing.
 				</p>
