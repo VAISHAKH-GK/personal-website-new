@@ -6,21 +6,82 @@ import { certifications } from '../data/certifications';
 
 <Layout
 	title="About Me"
-	description="About Your Name">
-	<center><p>I am Vaishakh G K — your tagline here.</center>
-	</p>
-	<p>Your professional background and what you do goes here. Describe your role, expertise, and what drives you.
-	</p>
-	Expand on your experience, philosophy, and what visitors can expect from your portfolio. Link to your credentials and social profiles as needed.
-	</p>
-<p>
-<center>
-<h1> Education</h1>
-	<p><h5> Your Degree, Expected Graduation Date, University Name
+	description="About Vaishakh G K"
+>
+	<center>
+		<h1>I'm Vaishakh G K</h1>
+		<p>
+			Software engineer interested in how things work — and how they can be secured.
+		</p>
+	</center>
+
 	<p>
-			Previous Degree, Year, University Name
-			<p>
-	Any honors or memberships <a href="https://example.com" target="blank">--></a>
+		I'm a software engineer who enjoys building things, taking them apart,
+		and understanding what happens underneath. My background is mainly in
+		software and backend development, where I've worked on web applications,
+		APIs, databases, distributed systems, and other networked software.
+	</p>
+
+	<p>
+		Over time, that curiosity has led me deeper into cybersecurity. I'm
+		interested in understanding how applications and systems can be
+		analyzed, tested, and secured, and I'm currently exploring areas such
+		as Linux, networking, application security, wireless security,
+		low-level programming, and systems engineering.
+	</p>
+
+	<p>
+		I enjoy learning by building. Some projects are useful applications,
+		some are experiments, and some start simply because I wanted to know
+		how something works. I work mostly with Go and C, while also spending
+		a lot of time around Linux, networking, web technologies, and
+		open-source software.
+	</p>
+
+	<h2>Beyond Programming</h2>
+
+	<p>
+		Computers aren't just something I use for work. I'm naturally curious
+		about technology in general, so I often find myself exploring Linux,
+		open-source projects, networking, hardware, embedded systems, and
+		anything else that catches my attention.
+	</p>
+
+	<p>
+		I enjoy experimenting with small ideas, building things that may never
+		become finished projects, trying different tools, and occasionally
+		going down a rabbit hole just to understand something that caught my
+		attention.
+	</p>
+
+	<h2>Why I Have This Website</h2>
+
+	<p>
+		This website is more than a portfolio. It's my personal space on the
+		internet — a place to keep track of what I'm building, what I'm
+		learning, and the things I find interesting.
+	</p>
+
+	<p>
+		I want to write about the things I learn in a way that is useful to
+		other people. If I spend several hours figuring out something that
+		seemed confusing at first, I'd rather document it so that someone
+		else can understand it a little faster.
+	</p>
+
+	<p>
+		You'll find my projects, technical notes, experiments, cybersecurity
+		writing, and other things I'm interested in here. Some of them will
+		be polished projects, while others will simply be a record of
+		something I wanted to explore.
+	</p>
+
+	<p>
+		This site will probably change as I do. The technologies I use,
+		the things I work on, and even my interests will change over time.
+		The idea is simply to keep building, keep learning, and share some
+		of that journey along the way.
+	</p>
 
 	<div class="certification-badges">
 		{certifications.map((cert) => (
@@ -44,18 +105,6 @@ import { certifications } from '../data/certifications';
 			margin: 2rem auto;
 			gap: 1.5rem;
 			justify-items: center;
-		}
-
-		@media (min-width: 1024px) {
-			.certification-badges {
-				grid-template-columns: repeat(3, 1fr);
-			}
-		}
-
-		@media (min-width: 768px) and (max-width: 1023px) {
-			.certification-badges {
-				grid-template-columns: repeat(2, 1fr);
-			}
 		}
 
 		@media (max-width: 767px) {
