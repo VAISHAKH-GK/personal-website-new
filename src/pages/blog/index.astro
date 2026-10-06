@@ -150,10 +150,22 @@ const posts = (await getCollection('blog')).sort(
 		<Header />
 		<main>
 			<section>
-				<div class="header">
-					<h1>Blog</h1>
-					<p>Technical writings on cloud security, infrastructure, and building with modern tools. A means to informally discuss and profess my perspective on projects, technology, and the process of building.</p>
-				</div>
+                <div class="header">
+                    <h1>Blog</h1>
+                    <p>
+                        A collection of things I've learned, built, broken, and figured out
+                        along the way. I write about software engineering, Linux, networking,
+                        cybersecurity, systems, and whatever technical rabbit hole happens to
+                        catch my attention.
+                    </p>
+                    <br>
+                    <p>
+                        These aren't always polished tutorials or definitive guides. Sometimes
+                        they're simply my notes and experiments — written down in the hope that
+                        they might help someone else, or that I'll find them useful when I
+                        come back to them later.
+                    </p>
+                </div>
 				<ul>
 					{
 						posts.map((post) => (

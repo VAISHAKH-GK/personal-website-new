@@ -18,13 +18,11 @@ const projects = (await getCollection('projects'))
 const getSlug = (id: string) => id.endsWith('/index') ? id.replace(/\/index$/, '') : id;
 
 const categoryLabels = {
-	'aws-security': 'AWS Security',
-	'aws-infra': 'AWS Infrastructure',
-	'homelab': 'Homelab',
-	'ai-tools': 'AI & Automation',
-	'local-dev': 'Local Development',
-	'aws-ai': 'AWS AI/ML',
-	'frontend-development': 'Frontend Development'
+	'cyber-security': 'Cyber Security',
+	'linux': 'Linux',
+	'programming': 'Programming',
+	'web': 'Web Development',
+	'networking': 'Networking',
 };
 ---
 
@@ -182,13 +180,33 @@ const categoryLabels = {
 		<Header />
 		<main>
 			<section>
-				<div class="intro">
-					<h1>Projects</h1>
-					<p>Most of my projects live at the intersection of cloud security, infrastructure automation, and DevSecOps; AWS org baselines, hardened architectures, and pipelines that make secure delivery the default. Mixed in, you’ll see the occasional website, homelab experiments, and AI-driven tooling where I use LLMs to reduce toil and sharpen workflows.
-					</p>
-					<p>
-					Some of these projects are polished reference architectures. Others are live experiments. All of them are part of the same goal: quietly raising the bar on how I design, secure, and ship systems. </p>
-				</div>
+                <div class="intro">
+                    <h1>Projects</h1>
+
+                    <p>
+                        I build projects to learn, solve problems, and explore ideas across
+                        software engineering, systems, and cybersecurity
+                    </p>
+
+                    <p>
+                        My work spans software engineering, backend development, systems
+                        programming, Linux, networking, and cybersecurity. I've built Go
+                        services and APIs, web applications, C/Linux software, open-source
+                        tools, and projects involving distributed systems and security.
+                    </p>
+
+                    <p>
+                        Some projects are built to solve a real problem, while others are
+                        experiments or ways to learn something new. As my interests have
+                        moved deeper into cybersecurity, more of my projects are also becoming
+                        about understanding how systems can be analyzed, tested, and secured.
+                    </p>
+
+                    <p>
+                        This section is a collection of those projects — finished work,
+                        ongoing experiments, and things I'm still figuring out.
+                    </p>
+                </div>
 				{projects.length === 0 ? (
 					<p>No projects yet. Check back soon!</p>
 				) : (

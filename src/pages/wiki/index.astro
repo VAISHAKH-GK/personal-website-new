@@ -100,10 +100,18 @@ const pagesByCategory = wikiPages.reduce((acc, page) => {
 		<Header />
 		<main>
 			<section>
-				<div class="intro">
-					<h1>Wiki</h1>
-					<p>Technical documentation, guides, and knowledge base.</p>
-				</div>
+                <div class="intro">
+                    <h1>Wiki</h1>
+                    <p>
+                        A collection of things I'm learning, figuring out, and don't want to
+                        forget.
+                    </p>
+                    <p>
+                        Notes, references, concepts, commands, and practical guides covering
+                        Linux, networking, programming, systems, cybersecurity, and whatever
+                        else I happen to be exploring.
+                    </p>
+                </div>
 				{wikiPages.length === 0 ? (
 					<p>No wiki pages yet. Documentation coming soon!</p>
 				) : (
