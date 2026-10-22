@@ -101,11 +101,21 @@ import { certifications } from '../data/certifications';
 	<style>
 		.certification-badges {
 			display: grid;
-			grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+			grid-template-columns: repeat(
+				auto-fit,
+				minmax(min(100%, 280px), 1fr)
+			);
 			max-width: 900px;
+			width: 100%;
 			margin: 2rem auto;
-			gap: 1.5rem;
-			justify-items: center;
+			gap: 1rem;
+			align-items: stretch;
+		}
+
+		.certification-badges > * {
+			width: 100%;
+			min-width: 0;
+			box-sizing: border-box;
 		}
 
 		@media (max-width: 767px) {
