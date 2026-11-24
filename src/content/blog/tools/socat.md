@@ -105,3 +105,35 @@ Address specific options are used to configure induvidual endpoints.
 |bind     |Specifies the local IP address to bind the socket|
 |keepalive|Enable TCP keepalive on socket                   |
 |reuseaddr|Allows local socket address to be reused         |
+
+<br>
+
+### Socat Usage Examples
+
+<br>
+
+#### 1. TCP Server & Client
+
+In this example we will see how we can create a simple TCP server and transfer data with it using a client, both will be created using socat.
+
+**Terminal 1 - TCP Server**
+```bash
+socat TCP-LISTEN:8080,reuseaddr STDIO
+```
+***Note**: STDIO as address means it will use standard input and out of terminal and will use it as endpoint.*
+
+This will start a TCP server that will listen to TCP requests on port 8080.
+
+**Terminal 2 - TCP Client**
+
+```bash
+socat TCP:localhost:8080 -
+```
+
+***Note**: - as address is same as STDIO*
+
+This will be acting as TCP client and will make connection to TCP  server.
+
+#### 2. UDP Communication
+
+In this example we will use socat to communicate using UDP protocol.
